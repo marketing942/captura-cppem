@@ -2,7 +2,7 @@
    CPPEM — Formulário → Google Sheets + redirect WhatsApp
    ========================================================= */
 
-const SHEET_URL    = "https://script.google.com/macros/s/AKfycbxdFplWVSfhTjvyIA7HIWb645xRjGNhBVhTdTf5UMjo0lSpW_A_jCuys0qB4uImKXPQ/exec";
+const SHEET_URL = "https://script.google.com/macros/s/AKfycbxdFplWVSfhTjvyIA7HIWb645xRjGNhBVhTdTf5UMjo0lSpW_A_jCuys0qB4uImKXPQ/exec";
 
 // ⚠️ TROQUE pelo número de WhatsApp de atendimento (somente dígitos, com DDI 55)
 const WHATSAPP_NUM = "5581973105354";
