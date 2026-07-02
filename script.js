@@ -80,7 +80,7 @@ document.getElementById("lead-form").addEventListener("submit", async (e) => {
     successEl.scrollIntoView({ behavior: "smooth", block: "center" });
 
    const msg = encodeURIComponent(
-  "Olá, acabei de me cadastrar!"
+  "Quero começar minha preparação!"
 );
 
 // Redireciona na mesma aba (sem popup)
