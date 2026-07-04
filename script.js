@@ -71,26 +71,39 @@ document.getElementById("lead-form").addEventListener("submit", async (e) => {
 
     e.target.reset();
 
-    // Dispara evento Lead no Meta Pixel
-    if (typeof fbq !== "undefined") fbq('track', 'Lead');
+// Mostra mensagem de sucesso
+const successEl = document.getElementById("form-success");
+successEl.hidden = false;
+successEl.scrollIntoView({ behavior: "smooth", block: "center" });
 
-    // Mostra mensagem de sucesso
-    const successEl = document.getElementById("form-success");
-    successEl.hidden = false;
-    successEl.scrollIntoView({ behavior: "smooth", block: "center" });
+const msg = encodeURIComponent("Quero começar minha preparação!");
 
-   const msg = encodeURIComponent(
-  "Quero começar minha preparação!"
+const redirectWhatsApp = () => {
+window.location.href = https://wa.me/${WHATSAPP_NUM}?text=${msg};
+};
+
+// Dispara evento Lead no Meta Pixel antes do redirecionamento
+if (typeof fbq === "function") {
+const eventID =
+"leadcppem" + Date.now() + "_" + Math.random().toString(36).slice(2);
+
+fbq(
+"track",
+"Lead",
+{
+content_name: "captura_cppem",
+origem: "captura.cppem.com.br"
+},
+{
+eventID: eventID
+}
 );
 
-// Redireciona na mesma aba (sem popup)
-window.location.href =
-  `https://wa.me/${WHATSAPP_NUM}?text=${msg}`;
+console.log("[Pixel] Evento Lead disparado:", eventID);
 
-  } catch (err) {
-    setError("telefone", "Erro ao enviar. Tente novamente.");
-  } finally {
-    btn.disabled    = false;
-    btn.textContent = "QUERO RECEBER ORIENTAÇÃO";
-  }
-});
+// Dá tempo para o evento sair antes de mandar para o WhatsApp
+setTimeout(redirectWhatsApp, 800);
+} else {
+console.warn("[Pixel] fbq não encontrado. Verifique o Pixel Global/PixelX.");
+setTimeout(redirectWhatsApp, 500);
+}
