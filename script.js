@@ -46,64 +46,69 @@ function validate() {
   return ok;
 }
 
-/* --- Envio --- */
+/ --- Envio --- /
 document.getElementById("lead-form").addEventListener("submit", async (e) => {
-  e.preventDefault();
-  if (!validate()) return;
+e.preventDefault();
+if (!validate()) return;
 
-  const btn = e.target.querySelector("button[type=submit]");
-  btn.disabled    = true;
-  btn.textContent = "ENVIANDO...";
+const form = e.target;
+const btn = form.querySelector("button[type=submit]");
 
-  const payload = {
-    nome:     document.getElementById("nome").value.trim(),
-    email:    document.getElementById("email").value.trim(),
-    telefone: telefoneInput.value.trim(),
-  };
+btn.disabled = true;
+btn.textContent = "ENVIANDO...";
 
-  try {
-    await fetch(SHEET_URL, {
-      method:  "POST",
-      mode:    "no-cors",
-      headers: { "Content-Type": "application/json" },
-      body:    JSON.stringify(payload),
-    });
+const payload = {
+nome: document.getElementById("nome").value.trim(),
+email: document.getElementById("email").value.trim(),
+telefone: telefoneInput.value.trim(),
+};
 
-    e.target.reset();
+try {
+// 1. Envia primeiro para o Google Sheets
+await fetch(SHEET_URL, {
+method: "POST",
+mode: "no-cors",
+headers: {
+"Content-Type": "text/plain;charset=utf-8"
+},
+body: JSON.stringify(payload),
+});
 
-// Mostra mensagem de sucesso
+// 2. Mostra sucesso
+form.reset();
+
 const successEl = document.getElementById("form-success");
 successEl.hidden = false;
 successEl.scrollIntoView({ behavior: "smooth", block: "center" });
 
+// 3. Dispara o evento Lead sem travar o envio
+try {
+if (typeof fbq === "function") {
+fbq("track", "Lead", {
+content_name: "captura_cppem",
+page_url: window.location.href
+});
+
+console.log("[Pixel] Lead disparado com sucesso.");
+} else {
+console.warn("[Pixel] fbq não encontrado.");
+}
+} catch (pixelError) {
+console.warn("[Pixel] Erro ao disparar Lead:", pixelError);
+}
+
+// 4. Redireciona para o WhatsApp depois de uma pequena pausa
 const msg = encodeURIComponent("Quero começar minha preparação!");
 
-const redirectWhatsApp = () => {
+setTimeout(() => {
 window.location.href = https://wa.me/${WHATSAPP_NUM}?text=${msg};
-};
+}, 700);
 
-// Dispara evento Lead no Meta Pixel antes do redirecionamento
-if (typeof fbq === "function") {
-const eventID =
-"leadcppem" + Date.now() + "_" + Math.random().toString(36).slice(2);
+} catch (err) {
+console.error("[Form] Erro ao enviar:", err);
+setError("telefone", "Erro ao enviar. Tente novamente.");
 
-fbq(
-"track",
-"Lead",
-{
-content_name: "captura_cppem",
-origem: "captura.cppem.com.br"
-},
-{
-eventID: eventID
+btn.disabled = false;
+btn.textContent = "QUERO RECEBER ORIENTAÇÃO";
 }
-);
-
-console.log("[Pixel] Evento Lead disparado:", eventID);
-
-// Dá tempo para o evento sair antes de mandar para o WhatsApp
-setTimeout(redirectWhatsApp, 800);
-} else {
-console.warn("[Pixel] fbq não encontrado. Verifique o Pixel Global/PixelX.");
-setTimeout(redirectWhatsApp, 500);
-}
+});
