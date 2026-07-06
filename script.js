@@ -4,7 +4,7 @@
 
 const SHEET_URL = "https://script.google.com/macros/s/AKfycbxdFplWVSfhTjvyIA7HIWb645xRjGNhBVhTdTf5UMjo0lSpW_A_jCuys0qB4uImKXPQ/exec?aba=CPPEM";
 
-const PIXELX_WHATSAPP_REDIRECT = "https://pxa.cppem.com.br/lt/whatsapp-redirect";
+const WHATSAPP_REDIRECT = "https://wa.me/5581973105354?text=Quero%20come%C3%A7ar%20minha%20prepara%C3%A7%C3%A3o!%20%F0%9F%92%80%F0%9F%94%A5";
 
 /* --- Elementos --- */
 const form = document.getElementById("lead-form");
@@ -138,7 +138,7 @@ if (form) {
       const msg = encodeURIComponent("Quero começar minha preparação!");
 
       setTimeout(() => {
-        window.location.href = `${PIXELX_WHATSAPP_REDIRECT}?text=${msg}`;
+        window.location.href = `${WHATSAPP_REDIRECT}`;
       }, 700);
 
     } catch (err) {
