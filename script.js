@@ -148,7 +148,7 @@ if (form) {
 
       if (btn) {
         btn.disabled = false;
-        btn.textContent = "QUERO RECEBER ORIENTAÇÃO";
+        btn.textContent = "QUERO ESTUDAR CERTO";
       }
     }
   });
