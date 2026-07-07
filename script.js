@@ -13,13 +13,13 @@ const telefoneInput = document.getElementById("telefone");
 /* --- Máscara: (00) 00000-0000 --- */
 if (telefoneInput) {
   telefoneInput.addEventListener("input", () => {
-    let d = telefoneInput.value.replace(/\D/g, "").slice(0, 11);
+    let d = telefoneInput.value.replace(/\D/g, "").slice(0, 13);
     let out = "";
 
     if (d.length > 0) out = "(" + d.slice(0, 2);
     if (d.length >= 2) out += ") ";
     if (d.length > 2) out += d.slice(2, 7);
-    if (d.length > 7) out += "-" + d.slice(7, 11);
+    if (d.length > 7) out += "-" + d.slice(7, 13);
 
     telefoneInput.value = out;
   });
