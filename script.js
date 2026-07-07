@@ -85,10 +85,14 @@ if (form) {
       btn.textContent = "ENVIANDO...";
     }
 
+    const nome = document.getElementById("nome").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const telefone = telefoneInput.value.trim();
+
     const payload = {
-      nome: document.getElementById("nome").value.trim(),
-      email: document.getElementById("email").value.trim(),
-      telefone: telefoneInput.value.trim(),
+      nome: nome,
+      email: email,
+      telefone: telefone,
       origem: "pagina_captura_cppem",
       pagina: window.location.href,
       data_envio: new Date().toISOString()
@@ -119,6 +123,27 @@ if (form) {
         }
       } catch (pixelError) {
         console.warn("[Pixel Meta] Erro ao disparar Lead:", pixelError);
+      }
+
+      // 2.5. Dispara evento Lead no Pixel X App (antes do redirecionamento)
+      try {
+        if (window.pixel_x_app && typeof window.pixel_x_app.send_event === "function") {
+          await window.pixel_x_app.send_event({
+            // Evento
+            event_name: "Lead",
+
+            // Lead
+            lead_name: nome,
+            lead_email: email,
+            lead_phone: telefone
+          });
+
+          console.log("[Pixel X App] Lead disparado com sucesso.");
+        } else {
+          console.warn("[Pixel X App] pixel_x_app.send_event não encontrado.");
+        }
+      } catch (pxaError) {
+        console.warn("[Pixel X App] Erro ao disparar Lead:", pxaError);
       }
 
       // 3. Mostra sucesso
