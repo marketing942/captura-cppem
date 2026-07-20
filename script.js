@@ -71,6 +71,32 @@ function validate() {
   return ok;
 }
 
+/* --- Classe de conversão do Pixel X App ---
+   A conversão do PixelX é contada pelo CLIQUE no botão que tem esta classe.
+   Para não contar Lead de quem clica sem preencher, a classe só fica no botão
+   enquanto o formulário está realmente válido (checagem silenciosa, sem mexer
+   na UI de erro). Sem preencher tudo → sem classe → sem conversão. */
+const PIXELX_CLASS = "xrmmmmzdllmckwinbxuh";
+const submitBtn = form ? form.querySelector("button[type='submit']") : null;
+
+function isFormValid() {
+  const nome = document.getElementById("nome")?.value.trim() || "";
+  const email = document.getElementById("email")?.value.trim() || "";
+  const tel = telefoneInput?.value.replace(/\D/g, "") || "";
+
+  return nome.length >= 2 && isEmail(email) && tel.length >= 11;
+}
+
+function syncPixelClass() {
+  if (submitBtn) submitBtn.classList.toggle(PIXELX_CLASS, isFormValid());
+}
+
+if (form) {
+  form.addEventListener("input", syncPixelClass);
+  form.addEventListener("change", syncPixelClass);
+  syncPixelClass();
+}
+
 /* --- Envio --- */
 if (form) {
   form.addEventListener("submit", async (e) => {
@@ -125,26 +151,10 @@ if (form) {
         console.warn("[Pixel Meta] Erro ao disparar Lead:", pixelError);
       }
 
-      // 2.5. Dispara evento Lead no Pixel X App (antes do redirecionamento)
-      try {
-        if (window.pixel_x_app && typeof window.pixel_x_app.send_event === "function") {
-          await window.pixel_x_app.send_event({
-            // Evento
-            event_name: "Lead",
-
-            // Lead
-            lead_name: nome,
-            lead_email: email,
-            lead_phone: telefone
-          });
-
-          console.log("[Pixel X App] Lead disparado com sucesso.");
-        } else {
-          console.warn("[Pixel X App] pixel_x_app.send_event não encontrado.");
-        }
-      } catch (pxaError) {
-        console.warn("[Pixel X App] Erro ao disparar Lead:", pxaError);
-      }
+      // Obs.: a conversão do Pixel X App é contada pelo clique no botão com a
+      // classe PIXELX_CLASS, que só está presente quando o form está válido
+      // (ver syncPixelClass acima). Por isso NÃO disparamos send_event aqui —
+      // evitaria contar a mesma conversão duas vezes.
 
       // 3. Mostra sucesso
       form.reset();
