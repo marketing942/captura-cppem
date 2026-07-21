@@ -11,21 +11,6 @@ const WHATSAPP_REDIRECT = "https://wa.me/5581973105354?text=Quero%20come%C3%A7ar
 const form = document.getElementById("lead-form");
 const telefoneInput = document.getElementById("telefone");
 
-/* --- Máscara: (00) 00000-0000 --- */
-if (telefoneInput) {
-  telefoneInput.addEventListener("input", () => {
-    let d = telefoneInput.value.replace(/\D/g, "").slice(0, 13);
-    let out = "";
-
-    if (d.length > 0) out = "(" + d.slice(0, 2);
-    if (d.length >= 2) out += ") ";
-    if (d.length > 2) out += d.slice(2, 7);
-    if (d.length > 7) out += "-" + d.slice(7, 13);
-
-    telefoneInput.value = out;
-  });
-}
-
 /* --- Validação --- */
 function setError(id, msg) {
   const input = document.getElementById(id);
@@ -50,7 +35,7 @@ function validate() {
 
   const nome = document.getElementById("nome")?.value.trim() || "";
   const email = document.getElementById("email")?.value.trim() || "";
-  const tel = telefoneInput?.value.replace(/\D/g, "") || "";
+  const tel = telefoneInput?.value.trim() || "";
 
   ["nome", "email", "telefone"].forEach(clearError);
 
@@ -64,8 +49,8 @@ function validate() {
     ok = false;
   }
 
-  if (tel.length < 11) {
-    setError("telefone", "Informe o telefone com DDD.");
+  if (tel.length < 1) {
+    setError("telefone", "Informe seu WhatsApp.");
     ok = false;
   }
 
