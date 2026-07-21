@@ -1,5 +1,6 @@
 /* =========================================================
-   CPPEM — Formulário → Google Sheets + Pixel + PixelX + WhatsApp
+   CPPEM — Formulário → Google Sheets + WhatsApp
+   (rastreamento é feito 100% via Google Tag Manager server-side)
    ========================================================= */
 
 const SHEET_URL = "https://script.google.com/macros/s/AKfycbxdFplWVSfhTjvyIA7HIWb645xRjGNhBVhTdTf5UMjo0lSpW_A_jCuys0qB4uImKXPQ/exec?aba=CPPEM";
@@ -71,32 +72,6 @@ function validate() {
   return ok;
 }
 
-/* --- Classe de conversão do Pixel X App ---
-   A conversão do PixelX é contada pelo CLIQUE no botão que tem esta classe.
-   Para não contar Lead de quem clica sem preencher, a classe só fica no botão
-   enquanto o formulário está realmente válido (checagem silenciosa, sem mexer
-   na UI de erro). Sem preencher tudo → sem classe → sem conversão. */
-const PIXELX_CLASS = "xrmmmmzdllmckwinbxuh";
-const submitBtn = form ? form.querySelector("button[type='submit']") : null;
-
-function isFormValid() {
-  const nome = document.getElementById("nome")?.value.trim() || "";
-  const email = document.getElementById("email")?.value.trim() || "";
-  const tel = telefoneInput?.value.replace(/\D/g, "") || "";
-
-  return nome.length >= 2 && isEmail(email) && tel.length >= 11;
-}
-
-function syncPixelClass() {
-  if (submitBtn) submitBtn.classList.toggle(PIXELX_CLASS, isFormValid());
-}
-
-if (form) {
-  form.addEventListener("input", syncPixelClass);
-  form.addEventListener("change", syncPixelClass);
-  syncPixelClass();
-}
-
 /* --- Envio --- */
 if (form) {
   form.addEventListener("submit", async (e) => {
@@ -135,28 +110,7 @@ if (form) {
         body: JSON.stringify(payload)
       });
 
-      // 2. Dispara evento Lead no Meta Pixel
-      try {
-        if (typeof fbq === "function") {
-          fbq("track", "Lead", {
-            content_name: "captura_cppem",
-            page_url: window.location.href
-          });
-
-          console.log("[Pixel Meta] Lead disparado com sucesso.");
-        } else {
-          console.warn("[Pixel Meta] fbq não encontrado.");
-        }
-      } catch (pixelError) {
-        console.warn("[Pixel Meta] Erro ao disparar Lead:", pixelError);
-      }
-
-      // Obs.: a conversão do Pixel X App é contada pelo clique no botão com a
-      // classe PIXELX_CLASS, que só está presente quando o form está válido
-      // (ver syncPixelClass acima). Por isso NÃO disparamos send_event aqui —
-      // evitaria contar a mesma conversão duas vezes.
-
-      // 3. Mostra sucesso
+      // 2. Mostra sucesso
       form.reset();
 
       const successEl = document.getElementById("form-success");
@@ -169,9 +123,7 @@ if (form) {
         });
       }
 
-      // 4. Redireciona pelo link rastreável da PixelX
-      const msg = encodeURIComponent("Quero começar minha preparação!");
-
+      // 3. Redireciona para o WhatsApp
       setTimeout(() => {
         window.location.href = `${WHATSAPP_REDIRECT}`;
       }, 700);
